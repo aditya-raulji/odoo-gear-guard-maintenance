@@ -124,6 +124,15 @@ router.post('/', auth, async (req, res) => {
       frequency
     } = req.body;
 
+    // Normalize optional fields: convert empty strings to null to satisfy PG types
+    const norm = (v) => (v === '' || v === undefined ? null : v);
+    const n_assigned_to = norm(assigned_to);
+    const n_due_date = norm(due_date);
+    const n_scheduled_date = norm(scheduled_date);
+    const n_work_center_id = norm(work_center_id);
+    const n_duration = norm(duration);
+    const n_frequency = norm(frequency);
+
     // Auto-fill logic: if equipment is selected, get category and team
     let category_id = null;
     let final_team_id = team_id;
@@ -152,9 +161,9 @@ router.post('/', auth, async (req, res) => {
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, NOW())
       RETURNING *`,
       [
-        task_name, type, subject, equipment_id, assigned_by || req.user.id, assigned_to,
-        due_date, scheduled_date, priority, stage || 'New', final_team_id, work_center_id,
-        final_maintenance_type, duration, frequency
+        task_name, type, subject, equipment_id || null, assigned_by || req.user.id, n_assigned_to,
+        n_due_date, n_scheduled_date, priority, stage || 'New', final_team_id || null, n_work_center_id,
+        final_maintenance_type || null, n_duration, n_frequency
       ]
     );
 
@@ -194,6 +203,19 @@ router.put('/:id', auth, async (req, res) => {
       hours_spent
     } = req.body;
 
+    // Normalize optional values
+    const norm = (v) => (v === '' || v === undefined ? null : v);
+    const n_equipment_id = norm(equipment_id);
+    const n_assigned_to = norm(assigned_to);
+    const n_due_date = norm(due_date);
+    const n_scheduled_date = norm(scheduled_date);
+    const n_team_id = norm(team_id);
+    const n_work_center_id = norm(work_center_id);
+    const n_maintenance_type = norm(maintenance_type);
+    const n_duration = norm(duration);
+    const n_frequency = norm(frequency);
+    const n_hours_spent = norm(hours_spent);
+
     // Get current request to check stage change
     const currentRequest = await pool.query(
       'SELECT stage, equipment_id FROM maintenance_requests WHERE id = $1',
@@ -223,9 +245,9 @@ router.put('/:id', auth, async (req, res) => {
         updated_at = NOW()
       WHERE id = $16 RETURNING *`,
       [
-        task_name, type, subject, equipment_id, assigned_to, due_date,
-        scheduled_date, priority, stage, team_id, work_center_id,
-        maintenance_type, duration, frequency, hours_spent, req.params.id
+        task_name, type, subject, n_equipment_id, n_assigned_to, n_due_date,
+        n_scheduled_date, priority, stage, n_team_id, n_work_center_id,
+        n_maintenance_type, n_duration, n_frequency, n_hours_spent, req.params.id
       ]
     );
 

@@ -9,6 +9,12 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Soft gradient background similar to inspiration */
+  background: radial-gradient(1200px 800px at -10% -10%, #e9f2ff 0%, transparent 60%),
+              radial-gradient(1000px 700px at 110% -20%, #eef7ff 0%, transparent 60%),
+              radial-gradient(900px 600px at 50% 120%, #f6f7ff 0%, transparent 60%),
+              #f9fbff;
+  color: #0a0f1c;
 }
 
 code {
@@ -18,4 +24,29 @@ code {
 
 /* Calendar styles */
 @import './styles/calendar.css';
+
+/* Component layer: reusable utilities for the new UI */
+@layer components {
+  .glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_10px_30px_-10px_rgba(2,6,23,0.12)];
+  }
+  .card {
+    @apply rounded-2xl glass;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center rounded-full px-5 py-2 font-medium transition-colors;
+  }
+  .btn-primary {
+    @apply btn bg-blue-600 text-white hover:bg-blue-700;
+  }
+  .btn-ghost {
+    @apply btn bg-white/70 text-gray-700 hover:bg-white;
+  }
+  .pill {
+    @apply rounded-full px-4 py-2 bg-blue-600 text-white shadow-md;
+  }
+  .nav-link {
+    @apply text-sm text-gray-600 hover:text-gray-900 px-3 py-2 rounded-full transition-colors;
+  }
+}
 

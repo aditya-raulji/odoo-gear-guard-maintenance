@@ -64,11 +64,13 @@ const Dashboard = () => {
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
       </div>
 
-      {/* Summary Boxes */}
+      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div
           onClick={() => handleBoxClick('overdue')}
-          className={`bg-red-50 border-2 ${filter === 'overdue' ? 'border-red-500' : 'border-red-200'} rounded-lg p-6 cursor-pointer hover:shadow-lg transition-shadow`}
+          className={`card p-6 cursor-pointer hover:shadow-lg transition-shadow ${
+            filter === 'overdue' ? 'ring-2 ring-red-400' : ''
+          }`}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -81,7 +83,9 @@ const Dashboard = () => {
 
         <div
           onClick={() => handleBoxClick('upcoming')}
-          className={`bg-blue-50 border-2 ${filter === 'upcoming' ? 'border-blue-500' : 'border-blue-200'} rounded-lg p-6 cursor-pointer hover:shadow-lg transition-shadow`}
+          className={`card p-6 cursor-pointer hover:shadow-lg transition-shadow ${
+            filter === 'upcoming' ? 'ring-2 ring-blue-400' : ''
+          }`}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -94,7 +98,9 @@ const Dashboard = () => {
 
         <div
           onClick={() => handleBoxClick('completed')}
-          className={`bg-green-50 border-2 ${filter === 'completed' ? 'border-green-500' : 'border-green-200'} rounded-lg p-6 cursor-pointer hover:shadow-lg transition-shadow`}
+          className={`card p-6 cursor-pointer hover:shadow-lg transition-shadow ${
+            filter === 'completed' ? 'ring-2 ring-green-400' : ''
+          }`}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -107,14 +113,14 @@ const Dashboard = () => {
       </div>
 
       {/* Tasks Table */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
+      <div className="card overflow-hidden">
+        <div className="px-6 py-4 border-b border-white/60">
           <h2 className="text-xl font-semibold text-gray-900">
             {filter ? `Tasks - ${filter.charAt(0).toUpperCase() + filter.slice(1)}` : 'All Tasks'}
           </h2>
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="min-w-full divide-y divide-gray-200/70">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -134,7 +140,7 @@ const Dashboard = () => {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-200/70">
               {tasks.length === 0 ? (
                 <tr>
                   <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
@@ -161,7 +167,7 @@ const Dashboard = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border ${getStatusColor(
+                        className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border ${getStatusColor(
                           task.stage,
                           task.is_overdue
                         )}`}

@@ -110,6 +110,17 @@ router.post('/', auth, async (req, res) => {
       company_id
     } = req.body;
 
+    // Normalize optional/foreign key fields: empty string -> null
+    const norm = (v) => (v === '' || v === undefined ? null : v);
+    const n_category_id = norm(category_id);
+    const n_department_id = norm(department_id);
+    const n_employee_id = norm(employee_id);
+    const n_maintenance_team_id = norm(maintenance_team_id);
+    const n_purchase_date = norm(purchase_date);
+    const n_warranty_date = norm(warranty_date);
+    const n_setup_date = norm(setup_date);
+    const n_company_id = norm(company_id) || 1;
+
     const result = await pool.query(
       `INSERT INTO equipment (
         name, serial_number, category_id, department_id, employee_id,
@@ -118,9 +129,9 @@ router.post('/', auth, async (req, res) => {
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW())
       RETURNING *`,
       [
-        name, serial_number, category_id, department_id, employee_id,
-        maintenance_team_id, location, purchase_date, warranty_date,
-        type_model, setup_date, description, company_id || 1
+        name, serial_number, n_category_id, n_department_id, n_employee_id,
+        n_maintenance_team_id, location, n_purchase_date, n_warranty_date,
+        type_model, n_setup_date, description, n_company_id
       ]
     );
 
@@ -149,6 +160,16 @@ router.put('/:id', auth, async (req, res) => {
       description
     } = req.body;
 
+    // Normalize optional/foreign key fields
+    const norm = (v) => (v === '' || v === undefined ? null : v);
+    const n_category_id = norm(category_id);
+    const n_department_id = norm(department_id);
+    const n_employee_id = norm(employee_id);
+    const n_maintenance_team_id = norm(maintenance_team_id);
+    const n_purchase_date = norm(purchase_date);
+    const n_warranty_date = norm(warranty_date);
+    const n_setup_date = norm(setup_date);
+
     const result = await pool.query(
       `UPDATE equipment SET
         name = $1,
@@ -167,9 +188,9 @@ router.put('/:id', auth, async (req, res) => {
       WHERE id = $13
       RETURNING *`,
       [
-        name, serial_number, category_id, department_id, employee_id,
-        maintenance_team_id, location, purchase_date, warranty_date,
-        type_model, setup_date, description, req.params.id
+        name, serial_number, n_category_id, n_department_id, n_employee_id,
+        n_maintenance_team_id, location, n_purchase_date, n_warranty_date,
+        type_model, n_setup_date, description, req.params.id
       ]
     );
 

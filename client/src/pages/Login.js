@@ -26,12 +26,15 @@ const Login = () => {
     setLoading(false);
   };
 
+  
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="max-w-md w-full card p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-blue-600 mb-2">GearGuard</h1>
-          <p className="text-gray-600">The Ultimate Maintenance Tracker</p>
+          <div className="mx-auto h-12 w-12 rounded-2xl bg-blue-600 mb-3" />
+          <h1 className="text-3xl font-bold text-gray-900 mb-1">Sign in</h1>
+          <p className="text-gray-600">Welcome back to GearGuard</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -80,11 +83,7 @@ const Login = () => {
             </Link>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
+          <button type="submit" disabled={loading} className="w-full btn-primary">
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
