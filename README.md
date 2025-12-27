@@ -1,24 +1,69 @@
-# GearGuard: The Ultimate Maintenance Tracker
+# GearGuard — Modern CMMS (Computerized Maintenance Management System)
 
-A comprehensive maintenance management system built with React, Node.js, and PostgreSQL.
+> A production-ready maintenance management system with a unified, polished UI. Built with React, Tailwind CSS, Node.js/Express, and PostgreSQL.
 
-## Features
+## Highlights
 
-- **Equipment Management**: Track assets by department and employee with comprehensive details
-- **Maintenance Teams**: Define teams and assign technicians
-- **Maintenance Requests**: Handle both Corrective (breakdown) and Preventive (routine) maintenance
-- **Kanban Board**: Drag-and-drop interface for managing request stages
-- **Calendar View**: Visualize preventive maintenance schedules
-- **Dashboard**: Overview of overdue, upcoming, and completed tasks
-- **Reports**: Analyze requests by team or equipment category
-- **Smart Auto-fill**: Automatic team and category assignment based on equipment selection
+- **Equipment Management**: Categories, departments, work centers, warranty, lifecycle
+- **Maintenance Requests**: Corrective and Preventive with stages and KPI tracking
+- **Kanban + Calendar**: Drag-and-drop pipeline and scheduled views
+- **Teams and Technicians**: Assign technicians by maintenance team
+- **Dashboard & Reports**: Overdue/upcoming/completed stats, grouped reports (Team/Category)
+- **Polished UI**: Glassy, consistent theme across the app
+
+## System Architecture
+
+```mermaid
+flowchart LR
+  subgraph Client [React Frontend]
+    A[Pages / Components]
+    B[AuthContext]
+    C[Axios Service]
+  end
+
+  subgraph Server [Node.js / Express]
+    R[Routes]
+    M[Middleware]
+    S[Business Logic]
+  end
+
+  subgraph DB [PostgreSQL]
+    T[(Tables / Views)]
+  end
+
+  A -- uses --> B
+  A -- fetch --> C
+  C -- REST --> R
+  R -- JWT Verify --> M
+  R -- SQL --> T
+```
+
+- Auth: JWT via Authorization header
+- UI: Tailwind utilities with custom `.card`, `.glass`, `.btn`
+- Reports: SQL aggregations exposed via `/api/dashboard/reports`
 
 ## Tech Stack
 
-- **Frontend**: React, Tailwind CSS, React Router, React Beautiful DnD
-- **Backend**: Node.js, Express
-- **Database**: PostgreSQL
-- **Authentication**: JWT
+- Frontend: React 18, Tailwind CSS 3, React Router 6, react-beautiful-dnd, FullCalendar
+- Backend: Node.js, Express, JWT
+- Database: PostgreSQL
+
+## Repository Structure
+
+```
+├── client/                      # React app
+│   └── src/
+│       ├── components/          # UI components (Layout, TaskModal, CalendarView)
+│       ├── pages/               # Pages (Dashboard, Maintenance, Equipment, Reports)
+│       ├── context/             # AuthContext
+│       └── index.css            # Tailwind + custom utilities
+├── server/                      # API server
+│   ├── routes/                  # Express routes (auth, equipment, maintenance, dashboard)
+│   ├── middleware/              # auth middleware
+│   └── config/                  # db pool
+├── database/                    # schema.sql
+└── README.md
+```
 
 ## Setup Instructions
 
@@ -44,7 +89,9 @@ A comprehensive maintenance management system built with React, Node.js, and Pos
    - Create a PostgreSQL database
    - Run the schema file:
      ```bash
-     psql -U postgres -d your_database_name -f database/schema.sql
+     psql -U postgres -d gear_guard_db -f database/schema.sql
+     node server/scripts/migrate.js   # optional helper (applies schema)
+     node server/scripts/seed.js      # seed minimal data
      ```
 
 4. **Environment Variables**
@@ -73,61 +120,59 @@ A comprehensive maintenance management system built with React, Node.js, and Pos
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:5000
 
-## Project Structure
+## Core Use-Cases
 
-```
-├── client/                 # React frontend
-│   ├── src/
-│   │   ├── components/    # Reusable components
-│   │   ├── pages/         # Page components
-│   │   ├── context/       # React context (Auth)
-│   │   └── utils/         # Utility functions
-│   └── public/
-├── server/                # Node.js backend
-│   ├── routes/           # API routes
-│   ├── middleware/       # Express middleware
-│   └── config/           # Configuration files
-├── database/             # Database schema
-└── README.md
-```
+### Corrective Maintenance
+1. Create request for broken equipment
+2. Auto-fills team/category from equipment
+3. Move through stages New → In Progress → Repaired
+4. Record hours spent
 
-## Key Workflows
+### Preventive Maintenance
+1. Create request with `scheduled_date`
+2. Appears in Calendar view
+3. Technician executes and marks done
 
-### Flow 1: The Breakdown (Corrective Maintenance)
-1. User creates a request for broken equipment
-2. System auto-fills team and category from equipment record
-3. Request starts in "New" stage
-4. Manager/technician assigns themselves
-5. Stage moves to "In Progress"
-6. Technician records hours spent and marks as "Repaired"
+## Data Model (simplified)
 
-### Flow 2: The Routine Checkup (Preventive Maintenance)
-1. Manager creates preventive request
-2. Sets scheduled date
-3. Request appears in Calendar View
-4. Technician can see and manage scheduled tasks
+- `users(id, name, email, password_hash, ...)`
+- `maintenance_teams(id, name, company_id, ...)`
+- `maintenance_team_members(team_id, user_id)`
+- `equipment_categories(id, name, responsible_id, company_id, ...)`
+- `equipment(id, name, category_id, department_id, employee_id, maintenance_team_id, ...)`
+- `maintenance_requests(id, task_name, type, subject, equipment_id, assigned_by, assigned_to, team_id, stage, due_date, scheduled_date, priority, maintenance_type, duration, frequency, hours_spent, ...)`
+- `work_centers(id, name, code, ...)`
 
-## Features Implementation
+## API Overview
 
-- ✅ Equipment tracking by department and employee
-- ✅ Maintenance team management
-- ✅ Maintenance request lifecycle
-- ✅ Auto-fill logic for requests
-- ✅ Kanban board with drag & drop
-- ✅ Calendar view for preventive maintenance
-- ✅ Dashboard with statistics
-- ✅ Reports (pivot/graph)
-- ✅ Smart buttons on equipment forms
-- ✅ Scrap logic for equipment
+- Auth: `POST /api/auth/register`, `POST /api/auth/login`
+- Equipment: `GET/POST/PUT/DELETE /api/equipment`
+- Maintenance Requests: `GET/POST/PUT /api/maintenance-requests`
+- Teams: `GET/POST/PUT /api/maintenance-teams` (includes team `members`)
+- Dashboard: `GET /api/dashboard/stats`, `GET /api/dashboard/tasks`, `GET /api/dashboard/reports?group_by=team|category`
 
-## API Endpoints
+All protected endpoints require `Authorization: Bearer <token>`.
 
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - User login
-- `GET /api/equipment` - Get all equipment
-- `GET /api/maintenance-requests` - Get all requests
-- `GET /api/dashboard/stats` - Get dashboard statistics
-- And more...
+## UI/UX Guidelines
+
+- Use `.card` for primary sections/panels
+- Use `.btn` / `.btn-primary` for actions; standard inputs
+- Tables: soft dividers and rounded containers
+- Toggles: prefer pill toggles for grouping filters (e.g., Reports)
+- Modals: glass + rounded, consistent spacing
+
+## Quality & Security
+
+- Input normalization across routes: empty string → null for integer/date fields
+- JWT auth via Express middleware
+- ESLint via CRA; Tailwind for consistent design
+
+## Scripts
+
+- `npm run dev` — Start backend and frontend concurrently
+- `npm run install-all` — Install root + client + server
+- `node server/scripts/migrate.js` — Apply `database/schema.sql`
+- `node server/scripts/seed.js` — Seed minimal data
 
 ## License
 
